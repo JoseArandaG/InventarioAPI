@@ -15,6 +15,7 @@ import os
 import dj_database_url
 from pathlib import Path
 from dotenv import load_dotenv
+from datetime import timedelta
 
 # Load environment variables from .env file
 load_dotenv()
@@ -45,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_simplejwt',
     'autenticacion',
 ]
 
@@ -108,6 +110,22 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated', # Por defecto, todo protegido
+    ],
+}
+
+# Configuración opcional de SimpleJWT
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/

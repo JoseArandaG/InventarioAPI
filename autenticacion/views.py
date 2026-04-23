@@ -2,52 +2,57 @@ from django.shortcuts import render
 
 # Create your views here.
 from django.db import connection
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework_simplejwt.tokens import RefreshToken
 
 @api_view(['POST'])
+@permission_classes([AllowAny]) # Permitir que cualquiera intente loguearse
 def login_api_view(request):
-    """
-    Recibe username y password, llama al SP en Supabase y retorna el resultado.
-    """
     username = request.data.get('username')
     password = request.data.get('password')
 
-    # Validación básica de entrada
-    if not username or not password:
-        return Response(
-            {"mensaje_salida": "Debe proporcionar usuario y contraseña."}, 
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
     try:
         with connection.cursor() as cursor:
-            # Ejecutamos tu función de Supabase
-            cursor.execute("SELECT * FROM login_usuario(%s, %s)", [username, password])
-            
-            # Recuperamos la fila (RETURNS TABLE)
+            cursor.execute("SELECT * FROM public.login_usuario(%s, %s)", [username, password])
             row = cursor.fetchone()
 
             if row:
-                # El orden depende de los campos de tu RETURNS TABLE en SQL
-                data = {
-                    "mensaje": row[0],
-                    "id_usuario": row[1],
-                    "username": row[2],
-                    "nombre_completo": row[3],
-                    "rol": row[4],
-                    "fecha_acceso": row[5]
-                }
+                mensaje = row[0]
+                
+                if mensaje == "Login exitoso":
+                    # Extraemos datos
+                    user_id = row[1]
+                    user_name = row[2]
+                    rol = row[4]
 
-                # Si el SP dice que el login es exitoso
-                if row[0] == "Login exitoso":
-                    return Response(data, status=status.HTTP_200_OK)
+                    # GENERACIÓN DEL TOKEN MANUAL
+                    # Usamos el ID de tu tabla de Supabase como 'user_id' en el token
+                    token = RefreshToken()
+                    # Podemos meter datos extra (payload) en el token
+                    token['username'] = user_name
+                    token['rol'] = rol
+                    token['user_id'] = user_id
+
+                    return Response({
+                        "mensaje": mensaje,
+                        "token": {
+                            "refresh": str(token),
+                            "access": str(token.access_token),
+                        },
+                        "user": {
+                            "id": user_id,
+                            "nombre": row[3],
+                            "rol": rol
+                        }
+                    }, status=status.HTTP_200_OK)
+                
                 else:
-                    # Mensajes de: "Contraseña incorrecta", "Usuario bloqueado", etc.
-                    return Response(data, status=status.HTTP_401_UNAUTHORIZED)
+                    return Response({"error": mensaje}, status=status.HTTP_401_UNAUTHORIZED)
             
-            return Response({"mensaje": "Error en la consulta"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "No se recibió respuesta del servidor"}, status=status.HTTP_404_NOT_FOUND)
 
     except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({"error_tecnico": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
