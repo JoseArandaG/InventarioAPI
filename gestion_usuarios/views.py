@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 
-# Usuarios
+####Usuarios####
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def listar_usuarios(request):
@@ -100,7 +100,7 @@ def cambiar_password(request):
 
 
 
-#Roles
+####Roles####
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def listar_roles(request):
@@ -156,3 +156,66 @@ def eliminar_rol(request, id_rol):
         # Limpiamos el error para no enviar todo el log técnico
         error_msg = str(e).split('\n')[0] 
         return Response({"error": error_msg}, status=status.HTTP_400_BAD_REQUEST)
+    
+
+##### Permisos #####
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def listar_permisos(request):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM public.sp_permiso_listar()")
+            columns = [col[0] for col in cursor.description]
+            res = [dict(zip(columns, row)) for row in cursor.fetchall()]
+        return Response(res)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def crear_permiso(request):
+    nombre = request.data.get('nombre_permiso')
+    desc = request.data.get('descripcion_permiso')
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM public.sp_permiso_crear(%s, %s)", [nombre, desc])
+            row = cursor.fetchone()
+        return Response({"id_permiso": row[0], "mensaje": row[1]}, status=201)
+    except Exception as e:
+        return Response({"error": str(e).split('\n')[0]}, status=400)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def actualizar_permiso(request):
+    """
+    Actualiza el nombre o la descripción de un permiso existente.
+    """
+    id_permiso = request.data.get('id_permiso')
+    nombre = request.data.get('nombre_permiso')
+    descripcion = request.data.get('descripcion_permiso')
+    
+    try:
+        with connection.cursor() as cursor:
+            # Llamamos a la función de Postgres que ya creamos en Supabase
+            cursor.execute("SELECT public.sp_permiso_actualizar(%s, %s, %s)", 
+                           [id_permiso, nombre, descripcion])
+            mensaje = cursor.fetchone()
+            
+        return Response({"mensaje": mensaje[0]}, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        # Capturamos el error si el permiso no existe o hay problemas de red
+        error_limpio = str(e).split('\n')[0]
+        return Response({"error": error_limpio}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def eliminar_permiso(request, id_permiso):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT public.sp_permiso_eliminar(%s)", [id_permiso])
+            msg = cursor.fetchone()
+        return Response({"mensaje": msg[0]})
+    except Exception as e:
+        return Response({"error": str(e).split('\n')[0]}, status=400)

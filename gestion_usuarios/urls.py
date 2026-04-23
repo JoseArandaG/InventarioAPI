@@ -11,7 +11,12 @@ from .views import (
     listar_roles, 
     crear_rol, 
     actualizar_rol, 
-    eliminar_rol
+    eliminar_rol,
+    #Endpoints de Permisos
+    listar_permisos,
+    crear_permiso,
+    actualizar_permiso,
+    eliminar_permiso
 )
 
 urlpatterns = [
@@ -28,4 +33,10 @@ urlpatterns = [
     path('roles/crear/', crear_rol, name='roles-create'),
     path('roles/actualizar/', actualizar_rol, name='roles-update'),
     path('roles/eliminar/<int:id_rol>/', eliminar_rol, name='roles-delete'),
+    
+    #Gestión de Permisos
+    path('permisos/', listar_permisos, name='permisos-list'),
+    path('permisos/crear/', crear_permiso, name='permisos-create'),
+    path('permisos/actualizar/', actualizar_permiso, name='permisos-update'), # <--- Añade esta
+    path('permisos/eliminar/<int:id_permiso>/', eliminar_permiso, name='permisos-delete'),
 ]
