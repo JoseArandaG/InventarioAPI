@@ -8,7 +8,10 @@ from .views import (
     gestionar_bloqueo,
     cambiar_password,
     # Endpoints de Roles
-    
+    listar_roles, 
+    crear_rol, 
+    actualizar_rol, 
+    eliminar_rol
 )
 
 urlpatterns = [
@@ -21,5 +24,8 @@ urlpatterns = [
     path('usuarios/password/', cambiar_password, name='usuarios-password'),
 
     # Gestión de Roles
-    
+    path('roles/', listar_roles, name='roles-list'),
+    path('roles/crear/', crear_rol, name='roles-create'),
+    path('roles/actualizar/', actualizar_rol, name='roles-update'),
+    path('roles/eliminar/<int:id_rol>/', eliminar_rol, name='roles-delete'),
 ]
