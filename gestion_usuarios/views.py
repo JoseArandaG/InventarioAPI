@@ -41,3 +41,44 @@ def eliminar_usuario(request, username):
         return Response({"mensaje": f"Usuario {username} eliminado"})
     except Exception as e:
         return Response({"error": str(e)}, status=400)
+    
+
+# gestion_usuarios/views.py
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def actualizar_usuario(request):
+    d = request.data
+    params = [d.get('username'), d.get('nombre'), d.get('apellido'), d.get('direccion'), d.get('correo'), d.get('telefono')]
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT public.sp_usuario_actualizar(%s,%s,%s,%s,%s,%s)", params)
+        return Response({"mensaje": "Usuario actualizado correctamente"})
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def gestionar_bloqueo(request):
+    username = request.data.get('username')
+    bloquear = request.data.get('bloquear') # Enviar true o false
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT public.sp_usuario_gestionar_bloqueo(%s, %s)", [username, bloquear])
+            res = cursor.fetchone()
+        return Response({"resultado": res[0]})
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def cambiar_password(request):
+    d = request.data
+    params = [d.get('username'), d.get('password_actual'), d.get('nueva_password')]
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM public.sp_usuario_cambiar_password(%s, %s, %s)", params)
+            row = cursor.fetchone()
+        return Response({"resultado": row[0], "mensaje": row[1]})
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
