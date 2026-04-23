@@ -9,50 +9,23 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 
 @api_view(['POST'])
-@permission_classes([AllowAny]) # Permitir que cualquiera intente loguearse
+@permission_classes([AllowAny])
 def login_api_view(request):
     username = request.data.get('username')
     password = request.data.get('password')
-
     try:
         with connection.cursor() as cursor:
             cursor.execute("SELECT * FROM public.login_usuario(%s, %s)", [username, password])
             row = cursor.fetchone()
-
-            if row:
-                mensaje = row[0]
-                
-                if mensaje == "Login exitoso":
-                    # Extraemos datos
-                    user_id = row[1]
-                    user_name = row[2]
-                    rol = row[4]
-
-                    # GENERACIÓN DEL TOKEN MANUAL
-                    # Usamos el ID de tu tabla de Supabase como 'user_id' en el token
-                    token = RefreshToken()
-                    # Podemos meter datos extra (payload) en el token
-                    token['username'] = user_name
-                    token['rol'] = rol
-                    token['user_id'] = user_id
-
-                    return Response({
-                        "mensaje": mensaje,
-                        "token": {
-                            "refresh": str(token),
-                            "access": str(token.access_token),
-                        },
-                        "user": {
-                            "id": user_id,
-                            "nombre": row[3],
-                            "rol": rol
-                        }
-                    }, status=status.HTTP_200_OK)
-                
-                else:
-                    return Response({"error": mensaje}, status=status.HTTP_401_UNAUTHORIZED)
-            
-            return Response({"error": "No se recibió respuesta del servidor"}, status=status.HTTP_404_NOT_FOUND)
-
+            if row and row[0] == "Login exitoso":
+                token = RefreshToken()
+                token['username'] = row[2]
+                token['rol'] = row[4]
+                return Response({
+                    "mensaje": row[0],
+                    "token": {"access": str(token.access_token), "refresh": str(token)},
+                    "user": {"id": row[1], "nombre": row[3], "rol": row[4]}
+                }, status=status.HTTP_200_OK)
+            return Response({"error": row[0] if row else "Credenciales inválidas"}, status=status.HTTP_401_UNAUTHORIZED)
     except Exception as e:
         return Response({"error_tecnico": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

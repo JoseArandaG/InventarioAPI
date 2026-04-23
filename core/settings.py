@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'autenticacion',
+    'gestion_usuarios',
 ]
 
 MIDDLEWARE = [
@@ -113,20 +114,25 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'autenticacion.authentication.SupabaseJWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated', # Por defecto, todo protegido
+        'rest_framework.permissions.IsAuthenticated',
     ],
 }
 
-# Configuración opcional de SimpleJWT
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': os.getenv('SUPABASE_JWT_SECRET'),
     'AUTH_HEADER_TYPES': ('Bearer',),
+    
+    # Supabase guarda el ID del usuario en el campo 'sub' del payload del JWT
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'sub', 
+    
+    # Como no usamos la DB interna de Django, le decimos que no intente 
+    # buscar al usuario en la tabla auth_user de Django al recibir un token.
 }
-
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 

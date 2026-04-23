@@ -18,6 +18,6 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include('autenticacion.urls')), # Prefijo para tu API
+    path('api/auth/', include('autenticacion.urls')),      # login/
+    path('api/gestion/', include('gestion_usuarios.urls')), # usuarios/, eliminar/, etc.
 ]
