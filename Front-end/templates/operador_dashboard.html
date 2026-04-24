@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>WMS Operator - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@800&family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body class="bg-[#faf8ff] h-screen flex flex-col">
+
+    <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6">
+        <h1 class="font-bold text-blue-700 text-lg">WMS OPERATOR</h1>
+        <button onclick="logout()" class="p-2 rounded-full hover:bg-slate-100">
+            <span class="material-symbols-outlined">logout</span>
+        </button>
+    </header>
+
+    <main class="flex-1 p-6 grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-hidden">
+        <div class="bg-white rounded-3xl shadow-sm p-8 flex flex-col items-center justify-center text-center border-2 border-dashed border-slate-200">
+            <div class="w-24 h-24 rounded-full primary-gradient flex items-center justify-center text-white mb-6 animate-pulse">
+                <span class="material-symbols-outlined text-4xl">mic</span>
+            </div>
+            <h2 class="text-2xl font-extrabold text-slate-800">Comando de Voz Activo</h2>
+            <p class="text-slate-500 mt-2">Diga: "Registrar entrada de 50 válvulas"</p>
+            
+            <div class="mt-8 w-full max-w-xs space-y-3">
+                <button onclick="registrarMovimiento('entrada')" class="w-full py-4 bg-green-600 text-white font-bold rounded-xl">Entrada Manual</button>
+                <button onclick="registrarMovimiento('salida')" class="w-full py-4 bg-red-600 text-white font-bold rounded-xl">Salida Manual</button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-sm p-6 flex flex-col overflow-hidden">
+            <h3 class="font-bold text-slate-800 mb-4">Mis Últimos Movimientos</h3>
+            <div id="historial-movimientos" class="space-y-4 overflow-y-auto">
+                </div>
+        </div>
+    </main>
+
+    <script src="{% static 'js/auth.js' %}"></script>
+    <script src="{% static 'js/operator.js' %}"></script>
+</body>
+</html>

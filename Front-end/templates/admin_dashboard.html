@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>InventoryOS - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;800&family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body class="bg-[#faf8ff] flex h-screen overflow-hidden">
+
+    <aside class="w-64 bg-slate-50 border-r flex flex-col p-4">
+        <div class="mb-8 flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl primary-gradient flex items-center justify-center text-white">
+                <span class="material-symbols-outlined">warehouse</span>
+            </div>
+            <h1 class="text-xl font-bold text-blue-700">InventoryOS</h1>
+        </div>
+        <nav class="flex-1 space-y-2">
+            <a href="#" class="flex items-center space-x-3 p-3 bg-white shadow-sm rounded-lg text-blue-700 font-bold">
+                <span class="material-symbols-outlined">inventory_2</span> <span>Inventario</span>
+            </a>
+            <button onclick="logout()" class="flex items-center space-x-3 p-3 text-red-600 w-full hover:bg-red-50 rounded-lg">
+                <span class="material-symbols-outlined">logout</span> <span>Cerrar Sesión</span>
+            </button>
+        </nav>
+    </aside>
+
+    <main class="flex-1 flex flex-col overflow-hidden">
+        <header class="h-16 bg-white border-b flex items-center justify-between px-8">
+            <h2 class="font-bold text-slate-800">Panel de Control</h2>
+            <div class="flex items-center space-x-4">
+                <span id="user-name" class="text-sm font-semibold text-slate-600">Cargando...</span>
+                <img id="user-avatar" class="w-8 h-8 rounded-full bg-slate-200">
+            </div>
+        </header>
+
+        <section class="p-8 overflow-y-auto">
+            <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+                <div class="p-6 border-b flex justify-between items-center">
+                    <h3 class="text-lg font-bold">Catálogo de Productos</h3>
+                    <button onclick="cargarProductos()" class="text-blue-600 text-sm font-bold hover:underline">Actualizar</button>
+                </div>
+                <table class="w-full text-left">
+                    <thead class="bg-slate-50 text-[10px] uppercase tracking-widest font-bold text-slate-500">
+                        <tr>
+                            <th class="px-6 py-4">Producto</th>
+                            <th class="px-6 py-4">Categoría</th>
+                            <th class="px-6 py-4">Stock</th>
+                            <th class="px-6 py-4">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-productos" class="divide-y text-sm">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="{% static 'js/auth.js' %}"></script>
+    <script src="{% static 'js/admin.js' %}"></script>
+</body>
+</html>

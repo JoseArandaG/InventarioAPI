@@ -17,7 +17,23 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from django.urls import path
+from django.shortcuts import render
+
+# Funciones simples para renderizar tus archivos
+def login_view(request):
+    return render(request, 'login.html')
+
+def admin_view(request):
+    return render(request, 'admin_dashboard.html')
+
+def operator_view(request):
+    return render(request, 'operador_dashboard.html')
+
 urlpatterns = [
     path('api/auth/', include('autenticacion.urls')),      # login/
     path('api/gestion/', include('gestion_usuarios.urls')), # usuarios/, eliminar/, etc.
+    path('login/', login_view, name='login'),
+    path('admin-dashboard/', admin_view, name='admin_dashboard'),
+    path('operator-dashboard/', operator_view, name='operator_dashboard'),
 ]

@@ -49,9 +49,11 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'autenticacion',
     'gestion_usuarios',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # Agrega el middleware de CORS
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -63,13 +65,21 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'core.urls'
 
+import os
+from pathlib import Path
+
+# Asegúrate de que BASE_DIR esté bien definido al inicio del archivo
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        # AQUÍ ESTÁ EL TRUCO:
+        'DIRS': [BASE_DIR / 'Front-end' / 'templates'], 
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -149,3 +159,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'Front-end' / 'assets',
+]
+
+CORS_ALLOW_ALL_ORIGINS = True

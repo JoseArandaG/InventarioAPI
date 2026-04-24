@@ -1,0 +1,34 @@
+/* Variables de color de tu diseño Architectural Void */
+:root {
+    --primary-blue: #004ac6;
+    --secondary-blue: #2563eb;
+    --surface: #faf8ff;
+    --error: #ba1a1a;
+}
+
+.primary-gradient {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+}
+
+.glass-effect {
+    backdrop-filter: blur(12px);
+    background-color: rgba(250, 248, 255, 0.7);
+}
+
+/* Animaciones */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.animate-spin-custom {
+    animation: spin 1s linear infinite;
+}
+
+/* Transiciones suaves para botones */
+button {
+    transition: all 0.2s ease-in-out;
+}
+
+button:active {
+    transform: scale(0.98);
+}
