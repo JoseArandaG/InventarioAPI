@@ -16,8 +16,9 @@ async function handleLogin(e) {
     const btnSubmit = document.getElementById('btnSubmit');
     const loader = document.getElementById('loader');
 
-    // Estado de carga
+    // 1. Resetear estado: ocultar error anterior y mostrar carga
     mensajeError.classList.add('hidden');
+    mensajeError.innerText = ''; // Limpiamos el texto previo
     loader.classList.remove('hidden');
     btnSubmit.disabled = true;
 
@@ -31,29 +32,29 @@ async function handleLogin(e) {
         const data = await response.json();
 
         if (response.ok) {
-            // Guardar sesión
+            // ... (Tu lógica de guardado de token se mantiene igual)
             localStorage.setItem('token', data.access_token);
             localStorage.setItem('user', JSON.stringify(data.user));
 
             const rol = data.user.rol.toLowerCase();
-            if (rol === 'operador') {
-            window.location.href = '/operator-dashboard/'; // Coincide con tu urls.py
-            } else {
-             window.location.href = '/admin-dashboard/';    // Coincide con tu urls.py
-    }
+            window.location.href = (rol === 'operador') ? '/operator-dashboard/' : '/admin-dashboard/';
         } else {
-            mensajeError.innerText = data.error || 'Acceso denegado';
+            // 2. Manejo de error específico de la API
+            // Si tu API de Django usa "detail" o "error", asegúrate de capturarlo:
+            mensajeError.innerText = data.error || data.detail || 'Usuario o contraseña incorrectos';
             mensajeError.classList.remove('hidden');
         }
     } catch (error) {
-        mensajeError.innerText = 'Error de conexión con el servidor.';
+        // 3. Manejo de error de red o servidor caído
+        console.error("Error de login:", error);
+        mensajeError.innerText = 'No se pudo conectar con el servidor. Inténtalo más tarde.';
         mensajeError.classList.remove('hidden');
     } finally {
+        // 4. Restaurar botón y ocultar loader
         loader.classList.add('hidden');
         btnSubmit.disabled = false;
     }
 }
-
 function logout() {
     localStorage.clear();
     window.location.href = 'login.html';
